@@ -10,17 +10,18 @@ import android.view.Window;
 public class MainActivity extends Activity {
 
 	MainView view;
-	final String WIDTH = "width";
-	final String HEIGHT = "height";
-	final String SCORE = "score";
-	final String HIGH_SCORE = "high score";
-	final String UNDO_SCORE = "undo score";
-	final String WON = "won";
-	final String LOSE = "lose";
-	final String CAN_UNDO = "can undo";
-	final String UNDO_GRID = "undo";
-	final String LAST_WON = "last won";
-	final String LAST_LOSE = "last lose";
+	public static final String WIDTH = "width";
+	public static final String HEIGHT = "height";
+	public static final String SCORE = "score";
+	public static final String HIGH_SCORE = "high score temp";
+	public static final String UNDO_SCORE = "undo score";
+	public static final String WON = "won";
+	public static final String LOSE = "lose";
+	public static final String CAN_UNDO = "can undo";
+	public static final String UNDO_GRID = "undo";
+	public static final String LAST_WON = "last won";
+	public static final String LAST_LOSE = "last lose";
+	public static final String ENDLESS = "endless";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +32,7 @@ public class MainActivity extends Activity {
 		SharedPreferences settings = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		view.hasSaveState = settings.getBoolean("save_state", false);
+
 		if (savedInstanceState != null) {
 			if (savedInstanceState.getBoolean("hasState")) {
 				load();
@@ -42,6 +44,7 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_MENU) {
+			// Do nothing
 			return true;
 		} else if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) {
 			view.game.move(2);
@@ -102,6 +105,7 @@ public class MainActivity extends Activity {
 		editor.putBoolean(CAN_UNDO, view.game.grid.canUndo);
 		editor.putBoolean(LAST_WON, view.game.lastWon);
 		editor.putBoolean(LAST_LOSE, view.game.lastLose);
+		editor.putBoolean(ENDLESS, !view.game.canContinue());
 		editor.commit();
 	}
 
@@ -110,7 +114,9 @@ public class MainActivity extends Activity {
 		load();
 	}
 
+	@SuppressWarnings("static-access")
 	private void load() {
+		// Stopping all animations
 		view.game.aGrid.cancelAnimations();
 
 		SharedPreferences settings = PreferenceManager
@@ -143,5 +149,7 @@ public class MainActivity extends Activity {
 				view.game.grid.canUndo);
 		view.game.lastWon = settings.getBoolean(LAST_WON, view.game.lastWon);
 		view.game.lastLose = settings.getBoolean(LAST_LOSE, view.game.lastLose);
+		view.game.maxValue = settings.getBoolean(ENDLESS, false) ? view.game.endingMaxValue
+				: view.game.startingMaxValue;
 	}
 }

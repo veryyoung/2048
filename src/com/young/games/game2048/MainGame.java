@@ -10,36 +10,40 @@ import java.util.List;
 
 public class MainGame {
 
+	public static final int SPAWN_ANIMATION = -1;
+	public static final int MOVE_ANIMATION = 0;
+	public static final int MERGE_ANIMATION = 1;
+
+	public static final int FADE_GLOBAL_ANIMATION = 0;
+
+	public static final long MOVE_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
+	public static final long SPAWN_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
+	public static final long NOTIFICATION_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME * 5;
+	public static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME
+			+ SPAWN_ANIMATION_TIME;
+	private static final String HIGH_SCORE = "high score";
+
+	public static final int startingMaxValue = 2048;
+	public static final int endingMaxValue = 8192;
+
 	public Grid grid = null;
 	public AnimationGrid aGrid;
 	final int numSquaresX = 4;
 	final int numSquaresY = 4;
 	final int startTiles = 2;
+	public int maxValue = startingMaxValue;
 
-	long score = 0;
-	long highScore = 0;
-	long undoScore = 0;
-	boolean won = false;
-	boolean lose = false;
-	boolean lastWon = false;
-	boolean lastLose = false;
+	public long score = 0;
+	public long highScore = 0;
+	public long undoScore = 0;
+	public boolean won = false;
+	public boolean lose = false;
+	public boolean lastWon = false;
+	public boolean lastLose = false;
 
-	Context mContext;
+	private Context mContext;
 
-	MainView mView;
-
-	static final int SPAWN_ANIMATION = -1;
-	static final int MOVE_ANIMATION = 0;
-	static final int MERGE_ANIMATION = 1;
-
-	static final int FADE_GLOBAL_ANIMATION = 0;
-
-	static final long MOVE_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-	static final long SPAWN_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME;
-	static final long NOTIFICATION_ANIMATION_TIME = MainView.BASE_ANIMATION_TIME * 5;
-	static final long NOTIFICATION_DELAY_TIME = MOVE_ANIMATION_TIME
-			+ SPAWN_ANIMATION_TIME;
-	static final String HIGH_SCORE = "high score";
+	private MainView mView;
 
 	public MainGame(Context context, MainView view) {
 		mContext = context;
@@ -60,6 +64,7 @@ public class MainGame {
 			recordHighScore();
 		}
 		score = 0;
+		maxValue = startingMaxValue;
 		won = false;
 		lose = false;
 		addStartTiles();
@@ -192,7 +197,7 @@ public class MainGame {
 						highScore = Math.max(score, highScore);
 
 						// The mighty 2048 tile
-						if (merged.getValue() == 2048) {
+						if (merged.getValue() >= maxValue) {
 							won = true;
 							endGame();
 						}
@@ -321,5 +326,16 @@ public class MainGame {
 
 	public boolean positionsEqual(Cell first, Cell second) {
 		return first.getX() == second.getX() && first.getY() == second.getY();
+	}
+
+	public void setEndlessMode() {
+		maxValue = endingMaxValue;
+		won = false;
+		mView.invalidate();
+		mView.refreshLastTime = true;
+	}
+
+	public boolean canContinue() {
+		return maxValue != endingMaxValue;
 	}
 }
