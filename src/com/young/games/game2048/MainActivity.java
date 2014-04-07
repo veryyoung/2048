@@ -15,13 +15,10 @@ public class MainActivity extends Activity {
 	public static final String SCORE = "score";
 	public static final String HIGH_SCORE = "high score temp";
 	public static final String UNDO_SCORE = "undo score";
-	public static final String WON = "won";
-	public static final String LOSE = "lose";
 	public static final String CAN_UNDO = "can undo";
 	public static final String UNDO_GRID = "undo";
-	public static final String LAST_WON = "last won";
-	public static final String LAST_LOSE = "last lose";
-	public static final String ENDLESS = "endless";
+	public static final String GAME_STATE = "game state";
+	public static final String UNDO_GAME_STATE = "undo game state";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,13 +96,10 @@ public class MainActivity extends Activity {
 		}
 		editor.putLong(SCORE, view.game.score);
 		editor.putLong(HIGH_SCORE, view.game.highScore);
-		editor.putLong(UNDO_SCORE, view.game.undoScore);
-		editor.putBoolean(WON, view.game.won);
-		editor.putBoolean(LOSE, view.game.lose);
-		editor.putBoolean(CAN_UNDO, view.game.grid.canUndo);
-		editor.putBoolean(LAST_WON, view.game.lastWon);
-		editor.putBoolean(LAST_LOSE, view.game.lastLose);
-		editor.putBoolean(ENDLESS, !view.game.canContinue());
+		editor.putLong(UNDO_SCORE, view.game.lastScore);
+		editor.putBoolean(CAN_UNDO, view.game.canUndo);
+		editor.putInt(GAME_STATE, view.game.gameState);
+		editor.putInt(UNDO_GAME_STATE, view.game.lastGameState);
 		editor.commit();
 	}
 
@@ -114,7 +108,6 @@ public class MainActivity extends Activity {
 		load();
 	}
 
-	@SuppressWarnings("static-access")
 	private void load() {
 		// Stopping all animations
 		view.game.aGrid.cancelAnimations();
@@ -142,14 +135,10 @@ public class MainActivity extends Activity {
 
 		view.game.score = settings.getLong(SCORE, view.game.score);
 		view.game.highScore = settings.getLong(HIGH_SCORE, view.game.highScore);
-		view.game.undoScore = settings.getLong(UNDO_SCORE, view.game.undoScore);
-		view.game.won = settings.getBoolean(WON, view.game.won);
-		view.game.lose = settings.getBoolean(LOSE, view.game.lose);
-		view.game.grid.canUndo = settings.getBoolean(CAN_UNDO,
-				view.game.grid.canUndo);
-		view.game.lastWon = settings.getBoolean(LAST_WON, view.game.lastWon);
-		view.game.lastLose = settings.getBoolean(LAST_LOSE, view.game.lastLose);
-		view.game.maxValue = settings.getBoolean(ENDLESS, false) ? view.game.endingMaxValue
-				: view.game.startingMaxValue;
+		view.game.lastScore = settings.getLong(UNDO_SCORE, view.game.lastScore);
+		view.game.canUndo = settings.getBoolean(CAN_UNDO, view.game.canUndo);
+		view.game.gameState = settings.getInt(GAME_STATE, view.game.gameState);
+		view.game.lastGameState = settings.getInt(UNDO_GAME_STATE,
+				view.game.lastGameState);
 	}
 }

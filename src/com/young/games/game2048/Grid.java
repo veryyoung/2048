@@ -6,11 +6,12 @@ public class Grid {
 
 	public Tile[][] field;
 	public Tile[][] undoField;
-	public boolean canUndo = false;
+	private Tile[][] bufferField;
 
 	public Grid(int sizeX, int sizeY) {
 		field = new Tile[sizeX][sizeY];
 		undoField = new Tile[sizeX][sizeY];
+		bufferField = new Tile[sizeX][sizeY];
 		clearGrid();
 		clearUndoGrid();
 	}
@@ -35,7 +36,7 @@ public class Grid {
 		}
 		return availableCells;
 	}
-	
+
 	public ArrayList<Cell> getNotAvailableCells() {
 		ArrayList<Cell> notAvailableCells = new ArrayList<Cell>();
 		for (int xx = 0; xx < field.length; xx++) {
@@ -94,13 +95,25 @@ public class Grid {
 	}
 
 	public void saveTiles() {
-		canUndo = true;
-		for (int xx = 0; xx < field.length; xx++) {
-			for (int yy = 0; yy < field[0].length; yy++) {
-				if (field[xx][yy] == null) {
+		for (int xx = 0; xx < bufferField.length; xx++) {
+			for (int yy = 0; yy < bufferField[0].length; yy++) {
+				if (bufferField[xx][yy] == null) {
 					undoField[xx][yy] = null;
 				} else {
 					undoField[xx][yy] = new Tile(xx, yy,
+							bufferField[xx][yy].getValue());
+				}
+			}
+		}
+	}
+
+	public void prepareSaveTiles() {
+		for (int xx = 0; xx < field.length; xx++) {
+			for (int yy = 0; yy < field[0].length; yy++) {
+				if (field[xx][yy] == null) {
+					bufferField[xx][yy] = null;
+				} else {
+					bufferField[xx][yy] = new Tile(xx, yy,
 							field[xx][yy].getValue());
 				}
 			}
@@ -108,7 +121,6 @@ public class Grid {
 	}
 
 	public void revertTiles() {
-		canUndo = false;
 		for (int xx = 0; xx < undoField.length; xx++) {
 			for (int yy = 0; yy < undoField[0].length; yy++) {
 				if (undoField[xx][yy] == null) {
@@ -136,5 +148,4 @@ public class Grid {
 			}
 		}
 	}
-
 }

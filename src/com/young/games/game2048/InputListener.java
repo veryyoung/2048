@@ -46,7 +46,7 @@ public class InputListener implements View.OnTouchListener {
 		case MotionEvent.ACTION_MOVE:
 			x = event.getX();
 			y = event.getY();
-			if (!mView.game.won && !mView.game.lose) {
+			if (mView.game.isActive()) {
 				float dx = x - previousX;
 				if (Math.abs(lastdx + dx) < Math.abs(lastdx) + Math.abs(dx)
 						&& Math.abs(dx) > RESET_STARTING
@@ -123,12 +123,10 @@ public class InputListener implements View.OnTouchListener {
 					mView.game.newGame();
 				} else if (iconPressed(mView.sXUndo, mView.sYIcons)) {
 					mView.game.revertUndoState();
-
 				} else if (iconPressed(mView.sXCheat, mView.sYIcons)) {
 					mView.game.cheat();
-				} else if (isTap()
-
-				&& inRange(mView.startingX, x, mView.endingX)
+				} else if (isTap(2)
+						&& inRange(mView.startingX, x, mView.endingX)
 						&& inRange(mView.startingY, x, mView.endingY)
 						&& mView.continueButtonEnabled) {
 					mView.game.setEndlessMode();
@@ -138,21 +136,21 @@ public class InputListener implements View.OnTouchListener {
 		return true;
 	}
 
-	public float pathMoved() {
+	private float pathMoved() {
 		return (x - startingX) * (x - startingX) + (y - startingY)
 				* (y - startingY);
 	}
 
-	public boolean iconPressed(int sx, int sy) {
-		return isTap() && inRange(sx, x, sx + mView.iconSize)
+	private boolean iconPressed(int sx, int sy) {
+		return isTap(1) && inRange(sx, x, sx + mView.iconSize)
 				&& inRange(sy, y, sy + mView.iconSize);
 	}
 
-	public boolean inRange(float left, float check, float right) {
-		return (left <= check && check <= right);
+	private boolean inRange(float starting, float check, float ending) {
+		return (starting <= check && check <= ending);
 	}
 
-	public boolean isTap() {
-		return pathMoved() <= mView.iconSize;
+	private boolean isTap(int factor) {
+		return pathMoved() <= mView.iconSize * factor;
 	}
 }

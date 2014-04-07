@@ -24,6 +24,7 @@ public class MainView extends View {
 	// Layout variables
 	private int cellSize = 0;
 	private float textSize = 0;
+	private float cellTextSize = 0;
 	private int gridWidth = 0;
 	private int TEXT_BLACK;
 	private int TEXT_WHITE;
@@ -61,8 +62,8 @@ public class MainView extends View {
 	public int sYIcons;
 	public int sXNewGame;
 	public int sXUndo;
-	public int iconSize;
 	public int sXCheat;
+	public int iconSize;
 
 	// Text values
 	private String headerText;
@@ -99,13 +100,15 @@ public class MainView extends View {
 
 		drawScoreText(canvas);
 
-		if ((game.won || game.lose) && !game.aGrid.isAnimationActive()) {
+		if (!game.isActive() && !game.aGrid.isAnimationActive()) {
 			drawNewGameButton(canvas, true);
 		}
 
 		drawCells(canvas);
 
-		drawEndGameState(canvas);
+		if (!game.isActive()) {
+			drawEndGameState(canvas);
+		}
 
 		if (!game.canContinue()) {
 			drawEndlessText(canvas);
@@ -116,7 +119,7 @@ public class MainView extends View {
 			invalidate(startingX, startingY, endingX, endingY);
 			tick();
 			// Refresh one last time on game end.
-		} else if ((game.won || game.lose) && refreshLastTime) {
+		} else if (!game.isActive() && refreshLastTime) {
 			invalidate();
 			refreshLastTime = false;
 		}
@@ -131,13 +134,13 @@ public class MainView extends View {
 		createOverlays();
 	}
 
-	public void drawDrawable(Canvas canvas, Drawable draw, int startingX,
+	private void drawDrawable(Canvas canvas, Drawable draw, int startingX,
 			int startingY, int endingX, int endingY) {
 		draw.setBounds(startingX, startingY, endingX, endingY);
 		draw.draw(canvas);
 	}
 
-	public void drawCellText(Canvas canvas, int value, int sX, int sY) {
+	private void drawCellText(Canvas canvas, int value, int sX, int sY) {
 		int textShiftY = centerText();
 		if (value >= 8) {
 			paint.setColor(TEXT_WHITE);
@@ -148,7 +151,7 @@ public class MainView extends View {
 				- textShiftY, paint);
 	}
 
-	public void drawScoreText(Canvas canvas) {
+	private void drawScoreText(Canvas canvas) {
 		// Drawing the score text: Ver 2
 		paint.setTextSize(bodyTextSize);
 		paint.setTextAlign(Paint.Align.CENTER);
@@ -195,7 +198,7 @@ public class MainView extends View {
 				bodyStartYAll, paint);
 	}
 
-	public void drawNewGameButton(Canvas canvas, boolean lightUp) {
+	private void drawNewGameButton(Canvas canvas, boolean lightUp) {
 		if (lightUp) {
 			drawDrawable(canvas, lightUpRectangle, sXNewGame, sYIcons,
 					sXNewGame + iconSize, sYIcons + iconSize);
@@ -208,14 +211,6 @@ public class MainView extends View {
 				sYIcons + iconSize - iconPaddingSize);
 	}
 
-	public void drawUndoButton(Canvas canvas) {
-		drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo
-				+ iconSize, sYIcons + iconSize);
-		drawDrawable(canvas, undoIcon, sXUndo + iconPaddingSize, sYIcons
-				+ iconPaddingSize, sXUndo + iconSize - iconPaddingSize, sYIcons
-				+ iconSize - iconPaddingSize);
-	}
-
 	public void drawCheatButton(Canvas canvas) {
 		drawDrawable(canvas, backgroundRectangle, sXCheat, sYIcons, sXCheat
 				+ iconSize, sYIcons + iconSize);
@@ -224,7 +219,15 @@ public class MainView extends View {
 				sYIcons + iconSize - iconPaddingSize);
 	}
 
-	public void drawHeader(Canvas canvas) {
+	private void drawUndoButton(Canvas canvas) {
+		drawDrawable(canvas, backgroundRectangle, sXUndo, sYIcons, sXUndo
+				+ iconSize, sYIcons + iconSize);
+		drawDrawable(canvas, undoIcon, sXUndo + iconPaddingSize, sYIcons
+				+ iconPaddingSize, sXUndo + iconSize - iconPaddingSize, sYIcons
+				+ iconSize - iconPaddingSize);
+	}
+
+	private void drawHeader(Canvas canvas) {
 		// Drawing the header
 		paint.setTextSize(headerTextSize);
 		paint.setColor(TEXT_BLACK);
@@ -243,12 +246,12 @@ public class MainView extends View {
 				+ textPaddingSize + 20, paint);
 	}
 
-	public void drawBackground(Canvas canvas) {
+	private void drawBackground(Canvas canvas) {
 		drawDrawable(canvas, backgroundRectangle, startingX, startingY,
 				endingX, endingY);
 	}
 
-	public void drawBackgroundGrid(Canvas canvas) {
+	private void drawBackgroundGrid(Canvas canvas) {
 		// Outputting the game grid
 		for (int xx = 0; xx < game.numSquaresX; xx++) {
 			for (int yy = 0; yy < game.numSquaresY; yy++) {
@@ -262,7 +265,7 @@ public class MainView extends View {
 		}
 	}
 
-	public void drawCells(Canvas canvas) {
+	private void drawCells(Canvas canvas) {
 		paint.setTextSize(textSize);
 		paint.setTextAlign(Paint.Align.CENTER);
 		// Outputting the individual cells
@@ -357,7 +360,7 @@ public class MainView extends View {
 		}
 	}
 
-	public void drawEndGameState(Canvas canvas) {
+	private void drawEndGameState(Canvas canvas) {
 		double alphaChange = 1;
 		continueButtonEnabled = false;
 		for (AnimationCell animation : game.aGrid.globalAnimation) {
@@ -366,16 +369,17 @@ public class MainView extends View {
 			}
 		}
 		BitmapDrawable displayOverlay = null;
-		if (game.won) {
+		if (game.gameWon()) {
 			if (game.canContinue()) {
 				continueButtonEnabled = true;
 				displayOverlay = winGameContinueOverlay;
 			} else {
 				displayOverlay = winGameFinalOverlay;
 			}
-		} else if (game.lose) {
+		} else if (game.gameLost()) {
 			displayOverlay = loseGameOverlay;
 		}
+
 		if (displayOverlay != null) {
 			displayOverlay.setBounds(startingX, startingY, endingX, endingY);
 			displayOverlay.setAlpha((int) (255 * alphaChange));
@@ -383,7 +387,7 @@ public class MainView extends View {
 		}
 	}
 
-	public void drawEndlessText(Canvas canvas) {
+	private void drawEndlessText(Canvas canvas) {
 		paint.setTextAlign(Paint.Align.LEFT);
 		paint.setTextSize(bodyTextSize);
 		paint.setColor(TEXT_BLACK);
@@ -391,7 +395,7 @@ public class MainView extends View {
 				paint);
 	}
 
-	public void createEndGameStates(Canvas canvas, boolean win,
+	private void createEndGameStates(Canvas canvas, boolean win,
 			boolean showButton) {
 		int width = endingX - startingX;
 		int length = endingY - startingY;
@@ -423,22 +427,22 @@ public class MainView extends View {
 		}
 	}
 
-	public void createBackgroundBitmap(int width, int height) {
+	private void createBackgroundBitmap(int width, int height) {
 		background = Bitmap
 				.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(background);
 		drawHeader(canvas);
+		drawCheatButton(canvas);
 		drawNewGameButton(canvas, false);
 		drawUndoButton(canvas);
-		drawCheatButton(canvas);
 		drawBackground(canvas);
 		drawBackgroundGrid(canvas);
 		drawInstructions(canvas);
 
 	}
 
-	public void createBitmapCells() {
-		paint.setTextSize(textSize);
+	private void createBitmapCells() {
+		paint.setTextSize(cellTextSize);
 		paint.setTextAlign(Paint.Align.CENTER);
 		Resources resources = getResources();
 		for (int xx = 0; xx < bitmapCell.length; xx++) {
@@ -451,7 +455,7 @@ public class MainView extends View {
 		}
 	}
 
-	public void createOverlays() {
+	private void createOverlays() {
 		Resources resources = getResources();
 		// Initalize overlays
 		Bitmap bitmap = Bitmap.createBitmap(endingX - startingX, endingY
@@ -471,7 +475,7 @@ public class MainView extends View {
 		loseGameOverlay = new BitmapDrawable(resources, bitmap);
 	}
 
-	public void tick() {
+	private void tick() {
 		currentTime = System.nanoTime();
 		game.aGrid.tickAll(currentTime - lastFPSTime);
 		lastFPSTime = currentTime;
@@ -481,13 +485,13 @@ public class MainView extends View {
 		lastFPSTime = System.nanoTime();
 	}
 
-	public static int log2(int n) {
+	private static int log2(int n) {
 		if (n <= 0)
 			throw new IllegalArgumentException();
 		return 31 - Integer.numberOfLeadingZeros(n);
 	}
 
-	public void getLayout(int width, int height) {
+	private void getLayout(int width, int height) {
 		cellSize = Math.min(width / (game.numSquaresX + 1), height
 				/ (game.numSquaresY + 3));
 		gridWidth = cellSize / 7;
@@ -501,6 +505,7 @@ public class MainView extends View {
 		paint.setTextSize(cellSize);
 		textSize = cellSize * cellSize
 				/ Math.max(cellSize, paint.measureText("0000"));
+		cellTextSize = textSize * 0.9f;
 		titleTextSize = textSize / 3;
 		bodyTextSize = (int) (textSize / 1.5);
 		instructionsTextSize = (int) (textSize / 1.5);
@@ -544,7 +549,7 @@ public class MainView extends View {
 		resyncTime();
 	}
 
-	public int centerText() {
+	private int centerText() {
 		return (int) ((paint.descent() + paint.ascent()) / 2);
 	}
 
