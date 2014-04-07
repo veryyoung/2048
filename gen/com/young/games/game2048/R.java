@@ -37,12 +37,13 @@ public final class R {
         public static final int cell_rectangle_8=0x7f02000d;
         public static final int cell_rectangle_8192=0x7f02000e;
         public static final int fade_rectangle=0x7f02000f;
-        public static final int ic_action_refresh=0x7f020010;
-        public static final int ic_action_settings=0x7f020011;
-        public static final int ic_action_undo=0x7f020012;
-        public static final int ic_launcher=0x7f020013;
-        public static final int light_up_rectangle=0x7f020014;
-        public static final int logo_2048=0x7f020015;
+        public static final int ic_action_cheat=0x7f020010;
+        public static final int ic_action_refresh=0x7f020011;
+        public static final int ic_action_settings=0x7f020012;
+        public static final int ic_action_undo=0x7f020013;
+        public static final int ic_launcher=0x7f020014;
+        public static final int light_up_rectangle=0x7f020015;
+        public static final int logo_2048=0x7f020016;
     }
     public static final class string {
         public static final int action_settings=0x7f050003;

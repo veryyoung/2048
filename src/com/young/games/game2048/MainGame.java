@@ -91,8 +91,28 @@ public class MainGame {
 		grid.insertTile(tile);
 		aGrid.startAnimation(tile.getX(), tile.getY(), SPAWN_ANIMATION,
 				SPAWN_ANIMATION_TIME, MOVE_ANIMATION_TIME, null); // Direction:
-																	// -1 =
+																	// -1 = //
 																	// EXPANDING
+	}
+
+	// cheat remove 2
+	public void cheat() {
+		ArrayList<Cell> notAvailableCell = grid.getNotAvailableCells();
+		Tile tile;
+		for (Cell cell : notAvailableCell) {
+			tile = grid.getCellContent(cell);
+			if (2 == tile.getValue()) {
+				grid.removeTile(tile);
+			}
+		}
+
+		if (grid.getNotAvailableCells().size() == 0) {
+			newGame();
+		}
+		saveUndoState();
+		mView.resyncTime();
+		mView.invalidate();
+
 	}
 
 	public void recordHighScore() {

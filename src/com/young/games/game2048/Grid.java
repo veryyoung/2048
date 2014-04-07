@@ -35,6 +35,18 @@ public class Grid {
 		}
 		return availableCells;
 	}
+	
+	public ArrayList<Cell> getNotAvailableCells() {
+		ArrayList<Cell> notAvailableCells = new ArrayList<Cell>();
+		for (int xx = 0; xx < field.length; xx++) {
+			for (int yy = 0; yy < field[0].length; yy++) {
+				if (field[xx][yy] != null) {
+					notAvailableCells.add(new Cell(xx, yy));
+				}
+			}
+		}
+		return notAvailableCells;
+	}
 
 	public boolean isCellsAvailable() {
 		return (getAvailableCells().size() >= 1);
