@@ -153,4 +153,5 @@ public class InputListener implements View.OnTouchListener {
 	private boolean isTap(int factor) {
 		return pathMoved() <= mView.iconSize * factor;
 	}
+
 }

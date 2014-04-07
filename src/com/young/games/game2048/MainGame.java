@@ -2,10 +2,13 @@ package com.young.games.game2048;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.SoundPool;
 import android.preference.PreferenceManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainGame {
@@ -54,6 +57,9 @@ public class MainGame {
 	private long bufferScore = 0;
 	private int bufferGameState = 0;
 
+	private SoundPool soudPool;
+	private HashMap<Integer, Integer> spMap;
+
 	private Context mContext;
 
 	private MainView mView;
@@ -61,9 +67,11 @@ public class MainGame {
 	public MainGame(Context context, MainView view) {
 		mContext = context;
 		mView = view;
+		initSoundPool();
 	}
 
 	public void newGame() {
+		playSound(3, 1);
 		if (grid == null) {
 			grid = new Grid(numSquaresX, numSquaresY);
 		} else {
@@ -132,6 +140,7 @@ public class MainGame {
 	}
 
 	private void moveTile(Tile tile, Cell cell) {
+
 		grid.field[tile.getX()][tile.getY()] = null;
 		grid.field[cell.getX()][cell.getY()] = tile;
 		tile.updatePosition(cell);
@@ -146,6 +155,7 @@ public class MainGame {
 
 	// cheat remove 2
 	public void cheat() {
+		playSound(3, 1);
 		ArrayList<Cell> notAvailableCell = grid.getNotAvailableCells();
 		Tile tile;
 		prepareUndoState();
@@ -172,6 +182,7 @@ public class MainGame {
 	}
 
 	public void revertUndoState() {
+		playSound(3, 1);
 		if (canUndo) {
 			canUndo = false;
 			aGrid.cancelAnimations();
@@ -196,6 +207,7 @@ public class MainGame {
 	}
 
 	public void move(int direction) {
+		playSound(1, 1); // move sound
 		aGrid.cancelAnimations();
 		// 0: up, 1: right, 2: down, 3: left
 		if (!isActive()) {
@@ -220,6 +232,8 @@ public class MainGame {
 
 					if (next != null && next.getValue() == tile.getValue()
 							&& next.getMergedFrom() == null) {
+						playSound(2, 1); // get ponit sound
+
 						Tile merged = new Tile(positions[1],
 								tile.getValue() * 2);
 						Tile[] temp = { tile, next };
@@ -249,6 +263,7 @@ public class MainGame {
 						// The mighty 2048 tile
 						if (merged.getValue() >= winValue() && !gameWon()) {
 							gameState = gameState + GAME_WIN; // Set win state
+							playSound(4, 1);
 							endGame();
 						}
 					} else {
@@ -281,6 +296,7 @@ public class MainGame {
 		if (!movesAvailable() && !gameWon()) {
 			gameState = GAME_LOST;
 			endGame();
+			playSound(5, 1);
 		}
 	}
 
@@ -393,5 +409,26 @@ public class MainGame {
 
 	public boolean canContinue() {
 		return !(gameState == GAME_ENDLESS || gameState == GAME_ENDLESS_WON);
+	}
+
+	private void initSoundPool() {
+		soudPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
+		spMap = new HashMap<Integer, Integer>();
+		spMap.put(1, soudPool.load(mView.getContext(), R.raw.sfx_wing, 1)); // slide
+		spMap.put(2, soudPool.load(mView.getContext(), R.raw.sfx_point, 1)); // get
+																				// point
+		spMap.put(3, soudPool.load(mView.getContext(), R.raw.sfx_swooshing, 1)); // swoosh
+		spMap.put(4, soudPool.load(mView.getContext(), R.raw.die, 1)); // die
+		spMap.put(5, soudPool.load(mView.getContext(), R.raw.win, 1)); // win
+	}
+
+	private void playSound(int sound, int number) {
+		AudioManager am = (AudioManager) mView.getContext().getSystemService(
+				Context.AUDIO_SERVICE);
+		float audioMaxVolumn = am.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+		float audioCurrentVolumn = am
+				.getStreamVolume(AudioManager.STREAM_MUSIC);
+		float volumnRatio = audioCurrentVolumn / audioMaxVolumn;
+		soudPool.play(spMap.get(sound), volumnRatio, volumnRatio, 1, number, 1);
 	}
 }
