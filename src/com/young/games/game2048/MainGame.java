@@ -148,6 +148,7 @@ public class MainGame {
 	public void cheat() {
 		ArrayList<Cell> notAvailableCell = grid.getNotAvailableCells();
 		Tile tile;
+		prepareUndoState();
 		for (Cell cell : notAvailableCell) {
 			tile = grid.getCellContent(cell);
 			if (2 == tile.getValue()) {
