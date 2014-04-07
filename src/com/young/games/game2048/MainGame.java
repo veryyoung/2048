@@ -157,7 +157,7 @@ public class MainGame {
 		}
 
 		if (grid.getNotAvailableCells().size() == 0) {
-			newGame();
+			addStartTiles();
 		}
 		saveUndoState();
 		mView.resyncTime();
