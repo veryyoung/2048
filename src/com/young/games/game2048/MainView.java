@@ -239,11 +239,11 @@ public class MainView extends View {
 
 	public void drawInstructions(Canvas canvas) {
 		// Drawing the instructions
-		paint.setTextSize(instructionsTextSize - 5);
+		paint.setTextSize(instructionsTextSize);
 		paint.setTextAlign(Paint.Align.LEFT);
-		int textShiftY = centerText() * 2;
+		int textShiftY = centerText() * 5;
 		canvas.drawText(instructionsText, startingX, endingY - textShiftY
-				+ textPaddingSize + 20, paint);
+				+ textPaddingSize, paint);
 	}
 
 	private void drawBackground(Canvas canvas) {
@@ -508,7 +508,7 @@ public class MainView extends View {
 		cellTextSize = textSize * 0.9f;
 		titleTextSize = textSize / 3;
 		bodyTextSize = (int) (textSize / 1.5);
-		instructionsTextSize = (int) (textSize / 1.5);
+		instructionsTextSize = (int) (textSize / 1.8);
 		headerTextSize = textSize * 2;
 		gameOverTextSize = textSize * 2;
 		textPaddingSize = (int) (textSize / 3);
