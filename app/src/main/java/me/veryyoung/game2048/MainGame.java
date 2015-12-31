@@ -27,7 +27,7 @@ public class MainGame {
     private static final String HIGH_SCORE = "high score";
 
     public static final int startingMaxValue = 2048;
-    public static final int endingMaxValue = 8192;
+    public static final int endingMaxValue = 32768;
 
     // Odd state = game is not active
     // Even state = game is active
