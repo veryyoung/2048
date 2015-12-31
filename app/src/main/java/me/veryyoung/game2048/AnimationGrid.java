@@ -1,4 +1,4 @@
-package com.young.games.game2048;
+package me.veryyoung.game2048;
 
 import java.util.ArrayList;
 
